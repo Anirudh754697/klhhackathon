@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Service Connector</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        form {
+            background: white;
+            padding: 20px;
+            max-width: 400px;
+            margin: 20px auto;
+            border-radius: 8px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        h2 {
+            margin-top: 20px;
+            color: #333;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            max-width: 600px;
+            margin: auto;
+        }
+
+        li {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Local Service Connector</h1>
+
+    <form id="serviceForm">
+        <input type="text" id="name" placeholder="Service Name" required>
+        <input type="text" id="category" placeholder="Category" required>
+        <input type="text" id="location" placeholder="Location" required>
+        <input type="number" id="price" placeholder="Price" required>
+        <input type="text" id="provider" placeholder="Provider Name" required>
+        <button type="submit">Add Service</button>
+    </form>
+
+    <h2>Available Services</h2>
+    <ul id="serviceList"></ul>
+
+    <script>
+        const serviceForm = document.getElementById('serviceForm');
+        const serviceList = document.getElementById('serviceList');
+
+        let services = JSON.parse(localStorage.getItem("services")) || [];
+
+        function displayServices() {
+            serviceList.innerHTML = "";
+            services.forEach((service, index) => {
+                serviceList.innerHTML += `
+                    <li>
+                        ${service.name} - ${service.category} - ${service.location} - $${service.price} - ${service.provider} 
+                        <button class="delete-btn" onclick="deleteService(${index})">Delete</button>
+                    </li>`;
+            });
+        }
+
+        serviceForm.addEventListener("submit", function(event) {
+            event.preventDefault();
+            let service = {
+                name: document.getElementById("name").value,
+                category: document.getElementById("category").value,
+                location: document.getElementById("location").value,
+                price: document.getElementById("price").value,
+                provider: document.getElementById("provider").value
+            };
+            services.push(service);
+            localStorage.setItem("services", JSON.stringify(services));
+            displayServices();
+            serviceForm.reset();
+        });
+
+        function deleteService(index) {
+            services.splice(index, 1);
+            localStorage.setItem("services", JSON.stringify(services));
+            displayServices();
+        }
+
+        displayServices();
+    </script>
+</body>
+</html>

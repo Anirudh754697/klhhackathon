@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HandyHub</title>
+    <style>
+        /* Google Font */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 50px;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 15px;
+            width: 100%;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loyal-tokens {
+            margin-left: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.3);
+            padding: 5px 10px;
+            border-radius: 10px;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1000px;
+            margin-top: 30px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        h1, h2 {
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        /* Category Section */
+        .category-section {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .category-box {
+            background: rgba(255, 255, 255, 0.3);
+    padding: 15px;
+    width: 140px;
+    height: 160px; /* Ensure a fixed height */
+    border-radius: 15px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2), -5px -5px 10px rgba(255, 255, 255, 0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+        }
+
+        .category-box img {
+    max-width: 80%;
+    max-height: 80px; /* Control image size */
+    object-fit: contain; /* Ensures the entire image is visible */
+    border-radius: 10px;
+}
+
+        /* Service List */
+        .service-list {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .service-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2), -5px -5px 10px rgba(255, 255, 255, 0.3);
+            transition: 0.3s;
+        }
+
+        .service-item:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .request-btn {
+            background: #22c55e;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s ease-in-out;
+            font-weight: bold;
+        }
+
+        .request-btn:hover {
+            background: #16a34a;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        HandyHub
+        <span class="loyal-tokens" id="loyalTokensDisplay">⭐ Loyal Tokens: 0</span>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <h1>Find a Service</h1>
+
+        <!-- Categories -->
+        <h2>Select a Service Category</h2>
+        <div class="category-section">
+            <div class="category-box" onclick="filterByCategory('Plumber')"> <img src="plumber.jpg" alt="Plumber">Plumber</div>
+            <div class="category-box" onclick="filterByCategory('Electrician')"> <img src="electrician.jpg" alt="Electrician">Electrician</div>
+            <div class="category-box" onclick="filterByCategory('Carpenter')"> <img src="carpenter.jpg" alt="Carpenter">Carpenter</div>
+            <div class="category-box" onclick="filterByCategory('Painter')"><img src="painter.jpg" alt="Painter">Painter</div>
+            <div class="category-box" onclick="filterByCategory('Mechanic')"><img src="mechanic.jpg" alt="Mechanic">Mechanic</div>
+            <div class="category-box" onclick="filterByCategory('House Cleaner')"><img src="maid.jpg" alt="House Cleaner">House Cleaner</div>
+        </div>
+
+        <!-- Service List -->
+        <h2>Available Services</h2>
+        <div id="serviceList" class="service-list"></div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        const serviceList = document.getElementById('serviceList');
+        const locationFilter = document.getElementById('locationFilter');
+        const tokenDisplay = document.getElementById('loyalTokensDisplay');
+
+        let services = JSON.parse(localStorage.getItem("services")) || [];
+        let selectedCategory = "";
+        let loyalTokens = JSON.parse(localStorage.getItem("loyalTokens")) || 0;
+
+        // Update Loyal Tokens Display
+        function updateLoyalTokens() {
+            tokenDisplay.innerHTML = `⭐ Loyal Tokens: ${loyalTokens}`;
+        }
+
+        // Display Services
+        function displayServices() {
+            serviceList.innerHTML = "";
+            let filteredServices = services.filter(service => {
+                return (!selectedCategory || service.workType === selectedCategory);
+            });
+
+            filteredServices.forEach((service, index) => {
+                serviceList.innerHTML += `
+                    <div class="service-item">
+                        <span><strong>${service.name}</strong> - ${service.workType} - ₹${service.price}</span>
+                        <button class="request-btn" onclick="requestService(${index})">Request</button>
+                    </div>`;
+            });
+        }
+
+        // Filter by Category
+        function filterByCategory(category) {
+            selectedCategory = category;
+            displayServices();
+        }
+
+        // Request a Service (Increment Loyal Tokens)
+        function requestService(index) {
+            localStorage.setItem("selectedService", JSON.stringify(services[index]));
+            loyalTokens+=50;
+            localStorage.setItem("loyalTokens", JSON.stringify(loyalTokens));
+            updateLoyalTokens();
+            window.location.href = "payment.html";
+        }
+
+        updateLoyalTokens();
+        displayServices();
+    </script>
+
+</body>
+</html>

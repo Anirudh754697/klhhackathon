@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Options</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            max-width: 400px;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        h1, h2 {
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .payment-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            background: #22c55e;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .btn:hover {
+            background: #16a34a;
+            transform: scale(1.05);
+        }
+
+        .qr-container, .cash-message {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .qr-container {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .qr-container img {
+            width: 180px;
+            height: 180px;
+            margin-top: 10px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .cash-message {
+            background: rgba(0, 255, 0, 0.2);
+            color: #0f0;
+            font-weight: bold;
+        }
+
+        .checkbox-container {
+            margin: 10px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-container input {
+            transform: scale(1.3);
+            cursor: pointer;
+        }
+
+        .token-display {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffdd57;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Payment Options</h1>
+        <h2>Service: <span id="serviceName"></span></h2>
+        <h2>Original Price: ₹<span id="originalPrice"></span></h2>
+
+        <div class="checkbox-container">
+            <p class="token-display">Available Tokens: <span id="availableTokens">0</span></p>
+            <input type="checkbox" id="useTokens" onchange="updatePrice()">
+            <label for="useTokens">Use Loyal Tokens (₹1 per token)</label>
+        </div>
+
+        <h2>Discount Applied: ₹<span id="discountAmount">0</span></h2>
+        <h2>Final Price: ₹<span id="finalPrice"></span></h2>
+
+        <div class="payment-options">
+            <button class="btn" onclick="showQRCode()">Pay via UPI</button>
+            <button class="btn" onclick="payCash()">Cash After Work</button>
+        </div>
+
+        <div class="qr-container" id="qrContainer">
+            <h2>Scan QR Code to Pay</h2>
+            <img id="qrCode" src="scanner.jpg" alt="UPI QR Code">
+        </div>
+
+        <div class="cash-message" id="cashMessage">
+            <p>Payment will be collected after service completion.</p>
+        </div>
+    </div>
+
+    <script>
+        // Get service details from localStorage
+        const selectedService = JSON.parse(localStorage.getItem("selectedService"));
+
+        if (!selectedService) {
+            alert("No service selected! Redirecting...");
+            window.location.href = "services.html"; // Redirect if no service is chosen
+        }
+
+        let serviceName = selectedService.name;
+        let price = parseFloat(selectedService.price) || 0; // Get service price from storage
+
+        // Get loyal tokens from localStorage (1 Token = ₹1 Discount)
+        let loyalTokens = JSON.parse(localStorage.getItem("loyalTokens")) || 0;
+        let discount = 0;
+        let finalPrice = price;
+
+        // Update HTML
+        document.getElementById('serviceName').innerText = serviceName;
+        document.getElementById('originalPrice').innerText = price;
+        document.getElementById('availableTokens').innerText = loyalTokens;
+        document.getElementById('finalPrice').innerText = finalPrice;
+
+        function updatePrice() {
+            let useTokens = document.getElementById("useTokens").checked;
+            discount = useTokens ? Math.min(loyalTokens, price) : 0;
+            finalPrice = price - discount;
+
+            document.getElementById('discountAmount').innerText = discount;
+            document.getElementById('finalPrice').innerText = finalPrice;
+        }
+
+        function showQRCode() {
+            document.getElementById('qrContainer').style.display = "block";
+            document.getElementById('cashMessage').style.display = "none";
+        }
+
+        function payCash() {
+            document.getElementById('cashMessage').style.display = "block";
+            document.getElementById('qrContainer').style.display = "none";
+        }
+    </script>
+
+</body>
+</html>
